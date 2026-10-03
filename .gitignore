@@ -1,36 +1,7 @@
-# Android & Gradle
 .gradle/
+.idea/
 build/
 app/build/
-*.iml
-.idea/
+backend/__pycache__/
 local.properties
-.externalNativeBuild/
-.cxx/
-captures/
-
-# Python Backend & Virtual Envs
-backend/venv/
-backend/.venv/
-venv/
-.venv/
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.pytest_cache/
 backend/.env
-
-# AI Model Weights & Cache
-.cache/
-huggingface/
-transformers/
-sentence_transformers/
-*.bin
-*.pt
-*.safetensors
-*.onnx
-
-# OS generated files
-.DS_Store
-Thumbs.db
