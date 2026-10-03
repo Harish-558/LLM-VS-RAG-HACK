@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">LLM vs RAG</string>
+    <string name="app_title">LLM vs RAG Comparison</string>
+    <string name="dashboard_tab">Dashboard</string>
+    <string name="compare_tab">Compare</string>
+    <string name="stats_tab">Stats</string>
+</resources>

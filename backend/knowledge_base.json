@@ -1,0 +1,38 @@
+[
+  {
+    "id": "fact-1",
+    "title": "Quantum Nova-X Processor",
+    "category": "Technology",
+    "content": "The Nova-X Quantum Processor was developed by QuantumCore Systems and launched on October 14, 2025. It operates at 128 superconducting qubits with a gate fidelity exceeding 99.94% and sub-10ns pulse speeds. It utilizes a custom helium dilution refrigerator operating at 15 millikelvin."
+  },
+  {
+    "id": "fact-2",
+    "title": "Aetheris Autonomous Drone (AAMD-4)",
+    "category": "Aeronautics",
+    "content": "The Aetheris Air Mobility Drone Model 4 (AAMD-4) has a maximum payload capacity of 45 kg and a flight range of 180 km. Powered by twin hydrogen fuel cells, its maximum operating ceiling is 3,500 meters above sea level. Emergency ballistic parachutes automatically deploy within 0.4 seconds of total power loss."
+  },
+  {
+    "id": "fact-3",
+    "title": "Apex Software Return Policy 2026",
+    "category": "Policy",
+    "content": "Under the Apex Enterprise Terms of Service (2026), customers may request a 100% money-back refund within 45 days of purchase for software licenses, provided fewer than 10 production API keys have been generated. Physical hardware accessory returns carry a mandatory 10% restocking fee unless proven defective upon arrival."
+  },
+  {
+    "id": "fact-4",
+    "title": "Helios-9 Mars Rover Mission",
+    "category": "Space Exploration",
+    "content": "NASA's Helios-9 Mars Exploration Rover launched on March 12, 2024, landing at Jezero Crater South. Its primary payload is the CHROMOS Raman Spectrometer, designed to detect subsurface bio-signatures up to 2.0 meters deep. The mission is scheduled for a total duration of 4 Earth years (approximately 2.1 Sol years)."
+  },
+  {
+    "id": "fact-5",
+    "title": "BioMed Synth-7 Synthesis Protocol",
+    "category": "Biochemistry",
+    "content": "The BioMed Synth-7 enzymatic protein expression protocol requires maintaining a constant reaction temperature of 37.5°C and a pH level of 7.42 ± 0.05. The optimal catalyst concentration is 0.05 Molar, and maximum yield is achieved after exactly 6 hours and 15 minutes of continuous incubation."
+  },
+  {
+    "id": "fact-6",
+    "title": "Vortex Energy Battery Bank V8",
+    "category": "Energy",
+    "content": "The Vortex V8 Industrial Energy Storage Unit delivers a continuous output of 250 kW with a total capacity of 1.2 MWh. It uses solid-state sodium-ion cells capable of 8,000 deep charge cycles before capacity degrades below 80%. It features liquid immersion cooling operating with biodegradable synthetic oil."
+  }
+]

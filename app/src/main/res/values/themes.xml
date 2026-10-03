@@ -1,0 +1,18 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.Harish333c" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Primary brand color (Teal). -->
+        <item name="colorPrimary">@color/primary_teal</item>
+        <item name="colorPrimaryVariant">@color/primary_teal_dark</item>
+        <item name="colorOnPrimary">@color/bg_dark_navy</item>
+
+        <!-- Secondary brand color (Orange). -->
+        <item name="colorSecondary">@color/secondary_orange</item>
+        <item name="colorSecondaryVariant">@color/accent_orange_dark</item>
+        <item name="colorOnSecondary">@color/white</item>
+
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">@color/bg_dark_navy</item>
+        <item name="android:windowBackground">@color/bg_dark_navy</item>
+    </style>
+</resources>
