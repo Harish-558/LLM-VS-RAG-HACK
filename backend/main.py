@@ -95,7 +95,7 @@ def get_status():
         "faiss_active": rag_engine.use_faiss,
         "active_pdf": rag_engine.active_pdf_name,
         "retrieval_mode": rag_engine.retrieval_mode,
-        "message": "API key configured successfully!" if llm_client.is_api_key_configured() else "API key missing. Add GROQ_API_KEY to backend/.env file."
+        "message": "API key configured successfully!" if llm_client.is_api_key_configured() else "API key missing. Add GROQ_API_KEY to Render Environment Variables or backend/.env file."
     }
 
 @app.post("/api/upload-pdf")

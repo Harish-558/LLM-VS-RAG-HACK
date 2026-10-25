@@ -9,8 +9,7 @@ import java.util.concurrent.TimeUnit
 object ApiClient {
     // Default URL for backend connection: Laptop LAN Wi-Fi IPv4 address (Port 8000)
     // Replace "10.133.138.130" with your laptop's Wi-Fi IP address if it changes
-    private var baseUrl: String = "http://10.133.138.130:8000/"
-
+    private var baseUrl = "https://llm-vs-rag-hack.onrender.com/"
     private var apiServiceInstance: ApiService? = null
 
     fun getBaseUrl(): String = baseUrl

@@ -3,14 +3,29 @@ import requests
 from typing import List, Dict, Any, Optional
 from dotenv import load_dotenv
 
-load_dotenv()
+# Ensure backend/.env is loaded for local development if present
+backend_dir = os.path.dirname(os.path.abspath(__file__))
+env_path = os.path.join(backend_dir, ".env")
+if os.path.exists(env_path):
+    load_dotenv(dotenv_path=env_path)
+else:
+    load_dotenv()
 
 class LLMClient:
     def __init__(self) -> None:
-        self.groq_key: str = os.getenv("GROQ_API_KEY", "").strip()
-        self.gemini_key: str = os.getenv("GEMINI_API_KEY", "").strip()
-        self.openai_key: str = os.getenv("OPENAI_API_KEY", "").strip()
         self.active_groq_model: Optional[str] = None
+
+    @property
+    def groq_key(self) -> str:
+        return os.getenv("GROQ_API_KEY", "").strip()
+
+    @property
+    def gemini_key(self) -> str:
+        return os.getenv("GEMINI_API_KEY", "").strip()
+
+    @property
+    def openai_key(self) -> str:
+        return os.getenv("OPENAI_API_KEY", "").strip()
 
     def is_api_key_configured(self) -> bool:
         return bool(self.groq_key or self.gemini_key or self.openai_key)
@@ -42,7 +57,7 @@ class LLMClient:
             )
         else:
             return (
-                "⚠️ API Key Not Configured. (Add GROQ_API_KEY to backend/.env)\n\n"
+                "⚠️ API Key Not Configured. (Add GROQ_API_KEY to Render Environment Variables or backend/.env)\n\n"
                 f"[Plain LLM standard response]: I don't have real-time or proprietary internal data regarding '{question}'. "
                 "Without ground-truth context, standard LLMs may provide generic answers or hallucinate exact model numbers and dates."
             )
@@ -88,13 +103,13 @@ class LLMClient:
                 top_doc = retrieved_docs[0]
                 page_info = f" (Page {top_doc['page']})" if top_doc.get("page") else ""
                 return (
-                    "⚠️ API Key Not Configured. (Add GROQ_API_KEY to backend/.env)\n\n"
+                    "⚠️ API Key Not Configured. (Add GROQ_API_KEY to Render Environment Variables or backend/.env)\n\n"
                     f"[RAG System Response grounded in '{top_doc['title']}{page_info}']:\n"
                     f"{top_doc['content']}"
                 )
             else:
                 return (
-                    "⚠️ API Key Not Configured. (Add GROQ_API_KEY to backend/.env)\n\n"
+                    "⚠️ API Key Not Configured. (Add GROQ_API_KEY to Render Environment Variables or backend/.env)\n\n"
                     "[RAG System Response]: No relevant documents were retrieved from knowledge base for this query."
                 )
 
