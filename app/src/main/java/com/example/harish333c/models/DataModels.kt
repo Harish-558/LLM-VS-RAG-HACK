@@ -12,7 +12,8 @@ data class RetrievedDoc(
     val category: String?,
     val content: String,
     @SerializedName("relevance_score")
-    val relevanceScore: Float
+    val relevanceScore: Float,
+    val page: Int? = null
 )
 
 data class CompareResponse(
@@ -71,5 +72,19 @@ data class ApiStatusResponse(
     val documentsCount: Int,
     @SerializedName("faiss_active")
     val faissActive: Boolean,
-    val message: String?
+    val message: String?,
+    @SerializedName("active_pdf")
+    val activePdf: String? = null
+)
+
+data class PdfUploadResponse(
+    val status: String,
+    val filename: String,
+    @SerializedName("pages_count")
+    val pagesCount: Int,
+    @SerializedName("chunks_count")
+    val chunksCount: Int,
+    @SerializedName("documents_total")
+    val documentsTotal: Int,
+    val message: String
 )

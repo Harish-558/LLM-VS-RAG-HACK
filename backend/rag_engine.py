@@ -1,7 +1,58 @@
 import json
 import os
+import io
 import numpy as np
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
+
+def extract_text_from_pdf(pdf_bytes: bytes) -> List[Dict[str, Any]]:
+    """
+    Extracts text page by page from raw PDF bytes.
+    """
+    from pypdf import PdfReader
+    reader = PdfReader(io.BytesIO(pdf_bytes))
+    pages_data = []
+    for idx, page in enumerate(reader.pages):
+        text = (page.extract_text() or "").strip()
+        if text:
+            pages_data.append({"page": idx + 1, "text": text})
+    return pages_data
+
+def chunk_page_text(text: str, page_num: int, filename: str, max_chunk_chars: int = 800, overlap: int = 100) -> List[Dict[str, Any]]:
+    """
+    Splits text into manageable chunks with page number tracking for RAG citations.
+    """
+    text = text.strip()
+    if not text:
+        return []
+    if len(text) <= max_chunk_chars:
+        return [{
+            "id": f"pdf-{page_num}-1",
+            "title": f"{filename} (Page {page_num})",
+            "category": "PDF Document",
+            "content": text,
+            "page": page_num,
+            "source": filename
+        }]
+    chunks = []
+    start = 0
+    chunk_idx = 1
+    while start < len(text):
+        end = min(start + max_chunk_chars, len(text))
+        chunk_content = text[start:end].strip()
+        if chunk_content:
+            chunks.append({
+                "id": f"pdf-{page_num}-{chunk_idx}",
+                "title": f"{filename} (Page {page_num}, Sec {chunk_idx})",
+                "category": "PDF Document",
+                "content": chunk_content,
+                "page": page_num,
+                "source": filename
+            })
+            chunk_idx += 1
+        if end == len(text):
+            break
+        start += (max_chunk_chars - overlap)
+    return chunks
 
 class RAGEngine:
     def __init__(self, knowledge_base_path: str = "knowledge_base.json"):
@@ -11,6 +62,7 @@ class RAGEngine:
         self.use_faiss = False
         self.index = None
         self.model = None
+        self.active_pdf_name: Optional[str] = None
 
         self.load_knowledge_base()
         self.init_embeddings_and_index()
@@ -38,12 +90,17 @@ class RAGEngine:
         self.texts = [f"Title: {doc['title']}\nContent: {doc['content']}" for doc in self.documents]
 
     def init_embeddings_and_index(self):
+        if not self.texts:
+            self.index = None
+            self.use_faiss = False
+            return
         try:
             from sentence_transformers import SentenceTransformer
             import faiss
 
-            # Lightweight sentence-transformer model
-            self.model = SentenceTransformer("all-MiniLM-L6-v2")
+            # Cache model instance so re-indexing PDFs is fast
+            if self.model is None:
+                self.model = SentenceTransformer("all-MiniLM-L6-v2")
             embeddings = self.model.encode(self.texts, convert_to_numpy=True)
             
             # Normalize for cosine similarity
@@ -57,6 +114,44 @@ class RAGEngine:
         except Exception as e:
             print(f"[RAGEngine] SentenceTransformer/FAISS init fallback notice: {e}")
             self.use_faiss = False
+
+    def index_pdf(self, filename: str, pdf_bytes: bytes, replace_existing: bool = True) -> Dict[str, Any]:
+        """
+        Extracts text from PDF, chunks it, and indexes it into FAISS.
+        If replace_existing is True, questions are answered strictly from the uploaded PDF.
+        """
+        pages_data = extract_text_from_pdf(pdf_bytes)
+        if not pages_data:
+            raise ValueError("No readable text found in the uploaded PDF. Please make sure the PDF contains text.")
+
+        pdf_docs = []
+        for p in pages_data:
+            chunks = chunk_page_text(p["text"], p["page"], filename)
+            pdf_docs.extend(chunks)
+
+        if replace_existing:
+            self.documents = pdf_docs
+        else:
+            self.documents.extend(pdf_docs)
+
+        self.active_pdf_name = filename
+        self.texts = [f"Title: {doc['title']}\nContent: {doc['content']}" for doc in self.documents]
+        self.init_embeddings_and_index()
+
+        return {
+            "filename": filename,
+            "pages_count": len(pages_data),
+            "chunks_count": len(pdf_docs),
+            "documents_total": len(self.documents)
+        }
+
+    def reset_to_default_knowledge_base(self):
+        """
+        Restores the built-in preset knowledge base.
+        """
+        self.active_pdf_name = None
+        self.load_knowledge_base()
+        self.init_embeddings_and_index()
 
     def search(self, query: str, top_k: int = 2) -> List[Dict[str, Any]]:
         if not self.documents:

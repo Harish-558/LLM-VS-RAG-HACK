@@ -1,16 +1,15 @@
 import os
 import requests
-import json
-from typing import List, Dict, Any, Tuple
+from typing import List, Dict, Any, Optional
 from dotenv import load_dotenv
 
 load_dotenv()
 
 class LLMClient:
-    def __init__(self):
-        self.groq_key = os.getenv("GROQ_API_KEY", "").strip()
-        self.gemini_key = os.getenv("GEMINI_API_KEY", "").strip()
-        self.openai_key = os.getenv("OPENAI_API_KEY", "").strip()
+    def __init__(self) -> None:
+        self.groq_key: str = os.getenv("GROQ_API_KEY", "").strip()
+        self.gemini_key: str = os.getenv("GEMINI_API_KEY", "").strip()
+        self.openai_key: str = os.getenv("OPENAI_API_KEY", "").strip()
         self.active_groq_model: Optional[str] = None
 
     def is_api_key_configured(self) -> bool:
@@ -52,16 +51,18 @@ class LLMClient:
         """
         Sends the question + retrieved context to LLM.
         """
-        context_text = "\n\n".join([
-            f"--- Document #{i+1}: {doc['title']} ---\n{doc['content']}"
-            for i, doc in enumerate(retrieved_docs)
-        ])
+        context_parts = []
+        for i, doc in enumerate(retrieved_docs):
+            page_info = f" (Page {doc['page']})" if doc.get("page") else ""
+            context_parts.append(f"--- Document #{i+1}: {doc['title']}{page_info} ---\n{doc['content']}")
+        context_text = "\n\n".join(context_parts)
 
         prompt = (
             f"Context Information:\n{context_text}\n\n"
             f"Question: {question}\n\n"
             "Instruction: Answer the question strictly using the provided context information above. "
             "Include specific figures, dates, and names mentioned in the context. "
+            "If citing information from a specific page or section, cite the page number. "
             "If the context does not contain the answer, state that clearly."
         )
 
@@ -85,9 +86,10 @@ class LLMClient:
         else:
             if retrieved_docs:
                 top_doc = retrieved_docs[0]
+                page_info = f" (Page {top_doc['page']})" if top_doc.get("page") else ""
                 return (
                     "⚠️ API Key Not Configured. (Add GROQ_API_KEY to backend/.env)\n\n"
-                    f"[RAG System Response grounded in '{top_doc['title']}']:\n"
+                    f"[RAG System Response grounded in '{top_doc['title']}{page_info}']:\n"
                     f"{top_doc['content']}"
                 )
             else:
@@ -104,25 +106,25 @@ class LLMClient:
         }
 
         # Priority list of model candidates
-        candidates = []
+        candidates: List[str] = []
         custom_model = os.getenv("GROQ_MODEL", "").strip()
         if custom_model:
             candidates.append(custom_model)
         if self.active_groq_model:
             candidates.append(self.active_groq_model)
         
-        default_candidates = [
-            "qwen/qwen3.8-27b",
+        default_candidates: List[str] = [
             "openai/gpt-oss-120b",
-            "openai/gpt-oss-20b",
             "llama-3.3-70b-versatile",
-            "llama-3.1-8b-instant"
+            "llama-3.1-8b-instant",
+            "llama3-70b-8192",
+            "llama3-8b-8192"
         ]
         for m in default_candidates:
             if m not in candidates:
                 candidates.append(m)
 
-        last_error = ""
+        last_error = "No active Groq models available."
         for model_name in candidates:
             payload = {
                 "model": model_name,
@@ -199,3 +201,4 @@ class LLMClient:
             return f"Error from OpenAI API ({resp.status_code}): {resp.text}"
         except Exception as e:
             return f"Failed to connect to OpenAI API: {str(e)}"
+

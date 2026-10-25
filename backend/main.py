@@ -1,7 +1,15 @@
+import os
+import sys
 import time
 import uuid
 from typing import List, Dict, Any, Optional
-from fastapi import FastAPI, HTTPException
+
+# Ensure backend directory is in sys.path
+backend_dir = os.path.dirname(os.path.abspath(__file__))
+if backend_dir not in sys.path:
+    sys.path.insert(0, backend_dir)
+
+from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
@@ -40,6 +48,7 @@ class RetrievedDoc(BaseModel):
     category: Optional[str] = "General"
     content: str
     relevance_score: float
+    page: Optional[int] = None
 
 class CompareResponse(BaseModel):
     id: str
@@ -83,7 +92,42 @@ def get_status():
         "api_key_configured": llm_client.is_api_key_configured(),
         "documents_count": len(rag_engine.get_all_documents()),
         "faiss_active": rag_engine.use_faiss,
+        "active_pdf": rag_engine.active_pdf_name,
         "message": "API key configured successfully!" if llm_client.is_api_key_configured() else "API key missing. Add GROQ_API_KEY to backend/.env file."
+    }
+
+@app.post("/api/upload-pdf")
+async def upload_pdf(file: UploadFile = File(...)):
+    if not file.filename.lower().endswith(".pdf"):
+        raise HTTPException(status_code=400, detail="Only PDF files (.pdf) are supported.")
+
+    content = await file.read()
+    if not content:
+        raise HTTPException(status_code=400, detail="Uploaded PDF file is empty.")
+
+    try:
+        result = rag_engine.index_pdf(filename=file.filename, pdf_bytes=content, replace_existing=True)
+        return {
+            "status": "success",
+            "filename": result["filename"],
+            "pages_count": result["pages_count"],
+            "chunks_count": result["chunks_count"],
+            "documents_total": result["documents_total"],
+            "message": f"Successfully indexed {result['chunks_count']} sections from {result['filename']} ({result['pages_count']} pages)."
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to process PDF: {str(e)}")
+
+@app.post("/api/reset-knowledge-base")
+def reset_knowledge_base():
+    rag_engine.reset_to_default_knowledge_base()
+    return {
+        "status": "online",
+        "api_key_configured": llm_client.is_api_key_configured(),
+        "documents_count": len(rag_engine.get_all_documents()),
+        "faiss_active": rag_engine.use_faiss,
+        "active_pdf": None,
+        "message": "Reset to default knowledge base successfully."
     }
 
 @app.get("/api/sample-questions")
@@ -141,7 +185,8 @@ def compare_llm_vs_rag(req: CompareRequest):
             title=doc.get("title", "Untitled Document"),
             category=doc.get("category", "General"),
             content=doc.get("content", ""),
-            relevance_score=round(doc.get("relevance_score", 0.0), 4)
+            relevance_score=round(doc.get("relevance_score", 0.0), 4),
+            page=doc.get("page")
         )
         for doc in retrieved_docs_raw
     ]

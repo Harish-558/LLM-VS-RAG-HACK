@@ -77,6 +77,13 @@ class MainActivity : AppCompatActivity() {
             showSettingsDialog()
         }
 
+        // Load saved base URL if previously configured in Settings
+        val prefs = getSharedPreferences("app_settings", MODE_PRIVATE)
+        val savedUrl = prefs.getString("backend_url", null)
+        if (!savedUrl.isNullOrEmpty()) {
+            ApiClient.setBaseUrl(savedUrl)
+        }
+
         // Default screen
         switchFragment(dashboardFragment)
 
@@ -161,6 +168,10 @@ class MainActivity : AppCompatActivity() {
             val newUrl = etUrl.text.toString().trim()
             if (newUrl.isNotEmpty()) {
                 ApiClient.setBaseUrl(newUrl)
+                getSharedPreferences("app_settings", MODE_PRIVATE)
+                    .edit()
+                    .putString("backend_url", ApiClient.getBaseUrl())
+                    .apply()
                 checkBackendStatus()
                 dashboardFragment.loadDashboardData()
                 Toast.makeText(this, "Base URL updated: ${ApiClient.getBaseUrl()}", Toast.LENGTH_SHORT).show()

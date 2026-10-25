@@ -18,7 +18,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:text="Default for Android Emulator: http://10.0.2.2:8000\nFor physical devices, enter host machine IP (e.g. http://192.168.1.5:8000)"
+        android:text="Connects phone to laptop backend on the same Wi-Fi.\nCurrent Laptop Wi-Fi IP: http://10.133.138.130:8000\n(For Android Emulator, use http://10.0.2.2:8000)"
         android:textColor="@color/text_secondary"
         android:textSize="12sp" />
 
@@ -28,7 +28,7 @@
         android:layout_height="48dp"
         android:layout_marginTop="14dp"
         android:background="@drawable/bg_input_field"
-        android:hint="http://10.0.2.2:8000"
+        android:hint="http://10.133.138.130:8000"
         android:inputType="textUri"
         android:padding="12dp"
         android:textColor="@color/text_primary"
