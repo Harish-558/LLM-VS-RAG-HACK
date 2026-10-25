@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # LLM vs RAG Comparison
 
 A project comparing factual accuracy between a Plain LLM and a RAG-based system using the same questions.
@@ -27,3 +28,7 @@ Built with a Kotlin Android frontend and a Python FastAPI backend using Sentence
 
    ```cmd
    cd backend
+=======
+# LLM-VS-RAG-HACK
+HACKHATON 
+>>>>>>> 0c9b23e5dc7ad2b72c468b747334a1353bf13523

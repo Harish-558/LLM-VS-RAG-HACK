@@ -1,7 +1,47 @@
+
+# Gradle and Android build files
 .gradle/
 .idea/
 build/
 app/build/
-backend/__pycache__/
+.kotlin/
+captures/
+.externalNativeBuild/
+.cxx/
+*.aab
+*.apk
+output-metadata.json
+
+# Local configuration
 local.properties
+
+# Python files
+backend/__pycache__/
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Environment variables and secrets
+.env
+**/.env
 backend/.env
+
+# Logs
+*.log
+
+# IntelliJ
+*.iml
+misc.xml
+deploymentTargetDropDown.xml
+render.experimental.xml
+
+# Keystore files
+*.jks
+*.keystore
+
+# Google Services
+google-services.json
+
+# Android profiling
+*.hprof
