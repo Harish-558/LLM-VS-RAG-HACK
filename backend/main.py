@@ -82,7 +82,8 @@ def read_root():
         "status": "online",
         "api_key_configured": llm_client.is_api_key_configured(),
         "docs_count": len(rag_engine.get_all_documents()),
-        "faiss_active": rag_engine.use_faiss
+        "faiss_active": rag_engine.use_faiss,
+        "retrieval_mode": rag_engine.retrieval_mode
     }
 
 @app.get("/api/status")
@@ -93,6 +94,7 @@ def get_status():
         "documents_count": len(rag_engine.get_all_documents()),
         "faiss_active": rag_engine.use_faiss,
         "active_pdf": rag_engine.active_pdf_name,
+        "retrieval_mode": rag_engine.retrieval_mode,
         "message": "API key configured successfully!" if llm_client.is_api_key_configured() else "API key missing. Add GROQ_API_KEY to backend/.env file."
     }
 
@@ -127,6 +129,7 @@ def reset_knowledge_base():
         "documents_count": len(rag_engine.get_all_documents()),
         "faiss_active": rag_engine.use_faiss,
         "active_pdf": None,
+        "retrieval_mode": rag_engine.retrieval_mode,
         "message": "Reset to default knowledge base successfully."
     }
 
